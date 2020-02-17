@@ -21,6 +21,8 @@ PLOT_HEIGHT = 400
 HTML_ELEMS = []
 XML_DIR = "./data/"
 HTML_DIR = "./out_python/"
+LINE_ALPHA = 0.1
+CIRCLE_ALPHA = 0.6
 
 
 def readXML(lt_name):
@@ -62,6 +64,12 @@ def readXML(lt_name):
         LTDATA["KeithleyTimeStamp"] -= LTDATA["KeithleyTimeStamp"][0]
 
 
+def calc_resistivity(lt_name):
+    max_length = 400
+    LTDATA["resistivity"] = LTDATA["Resistance_ohm"] / \
+        (max_length-LTDATA["Level_mm"])
+
+
 def plot_current_vs_time(lt_name):
     """
 
@@ -94,8 +102,9 @@ def plot_current_vs_time(lt_name):
     #
     # Plot data.
     #
-    plt.line("t", "y", source=data_source, legend_label="Current (A)")
-    plt.circle("t", "y", source=data_source, size=3)
+    plt.line("t", "y", source=data_source,
+             legend_label="Current (A)", alpha=LINE_ALPHA)
+    plt.circle("t", "y", source=data_source, size=3, alpha=CIRCLE_ALPHA)
 
     #
     # Append plot to HTML elements for final report.
@@ -136,8 +145,9 @@ def plot_resistance_vs_time(lt_name):
     #
     # Plot data.
     #
-    plt.line("t", "y", source=data_source, legend_label="Resistance (Ω)")
-    plt.circle("t", "y", source=data_source, size=3)
+    plt.line("t", "y", source=data_source,
+             legend_label="Resistance (Ω)", alpha=LINE_ALPHA)
+    plt.circle("t", "y", source=data_source, size=3, alpha=CIRCLE_ALPHA)
 
     #
     # Append plot to HTML elements for final report.
@@ -178,8 +188,52 @@ def plot_level_vs_time(lt_name):
     #
     # Plot data.
     #
-    plt.line("t", "y", source=data_source, legend_label="Level (mm)")
-    plt.circle("t", "y", source=data_source, size=3)
+    plt.line("t", "y", source=data_source,
+             legend_label="Level (mm)", alpha=LINE_ALPHA)
+    plt.circle("t", "y", source=data_source, size=3, alpha=CIRCLE_ALPHA)
+
+    #
+    # Append plot to HTML elements for final report.
+    #
+    HTML_ELEMS.append(plt)
+
+
+def plot_resistivity_vs_time(lt_name):
+    """
+
+    """
+
+    #
+    # Prepare data source.
+    #
+    _t = LTDATA["KeithleyTimeStamp"]
+    _y = LTDATA["resistivity"]
+    data_source = ColumnDataSource(data=dict(t=_t, y=_y))
+
+    #
+    # Format plot.
+    #
+    plt = bokeh.plotting.figure(tools=TOOLS)
+    plt.toolbar.logo = None
+    plt.plot_width = PLOT_WIDTH
+    plt.plot_height = PLOT_HEIGHT
+    plt.add_layout(
+        Title(
+            text=f"{lt_name} — Resistivity vs time",
+            text_font_style="normal",
+            align="center"),
+        "above")
+    plt.xaxis.axis_label = "Time (s)"
+    plt.yaxis.axis_label = "Resistivity (Ω/mm)"
+    plt.yaxis.formatter = NumeralTickFormatter(format="0.000")
+    plt.x_range = HTML_ELEMS[0].x_range
+
+    #
+    # Plot data.
+    #
+    plt.line("t", "y", source=data_source,
+             legend_label="Resistivity (Ω/mm)", alpha=LINE_ALPHA)
+    plt.circle("t", "y", source=data_source, size=3, alpha=CIRCLE_ALPHA)
 
     #
     # Append plot to HTML elements for final report.
@@ -205,9 +259,11 @@ def main(lt_name):
 
     """
     readXML(lt_name)
+    calc_resistivity(lt_name)
     plot_current_vs_time(lt_name)
     plot_resistance_vs_time(lt_name)
     plot_level_vs_time(lt_name)
+    plot_resistivity_vs_time(lt_name)
     write_to_html_file(lt_name, True)
 
 
