@@ -19,9 +19,9 @@ python lt_analysis.py
 ## Output
 
 
-<https://nichub.github.io/LT_CURRENT_TEST/out_python/LT01.html>
+<https://nichub.github.io/LT_CURRENT_TEST/out_python_bokeh/LT01.html>
 
-<https://nichub.github.io/LT_CURRENT_TEST/out_python/LT30.html>
+<https://nichub.github.io/LT_CURRENT_TEST/out_python_bokeh/LT30.html>
 
 
 ## TO DO
