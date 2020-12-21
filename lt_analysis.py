@@ -15,11 +15,14 @@ This module shows some basic plotting techniques with Bokeh.
 
 import logging
 import sys
+import time
 import warnings
 import xml.etree.ElementTree as ET
 
 import numpy as np
+
 from plot_bokeh import PlotBokeh
+from plot_plotly import PlotPlotly
 
 
 # User choices.
@@ -28,7 +31,7 @@ SETTINGS = {
         "DATA_DIR": "./data/",
         "DATA_FILES": ["LT01", "LT30"],
         "LT_MAX_LEVEL": 400,
-        "PLOT_WIDTH": 1600,
+        "PLOT_WIDTH": 1200,
         "PLOT_HEIGHT": 400,
         "LOGGING_ENABLED": True,
         "LOGGING_LEVEL": 10,
@@ -40,11 +43,16 @@ SETTINGS = {
                    "#78fe59", "#7a0402", "#a1fc3d"),
     },
     "BOKEH": {
+        "DO_IT": True,
         "TOOLS": "pan, box_zoom, wheel_zoom, save, reset, xzoom_in, xzoom_out",
         "ALPHA_1": 1,  # 0.1
         "ALPHA_6": 1,  # 0.6
         "CIRCLE_SIZE": 3,
         "OUT_DIR": "./out_python_bokeh/",
+    },
+    "PLOTLY": {
+        "DO_IT": True,
+        "OUT_DIR": "./out_python_plotly/",
     }
 }
 
@@ -103,6 +111,24 @@ def read_data(data_file, settings):
     return data
 
 
+def remove_data_for_faster_processing(data):
+    """ ___ """
+
+    for _i in range(3):
+        data["lt_data"]["Level_mm"] = \
+            np.delete(data["lt_data"]["Level_mm"], np.s_[::2], 1)
+        data["lt_data"]["Voltage_V"] = \
+            np.delete(data["lt_data"]["Voltage_V"], np.s_[::2], 1)
+        data["lt_data"]["KeithleyTimeStamp"] = \
+            np.delete(data["lt_data"]["KeithleyTimeStamp"], np.s_[::2], 1)
+        data["lt_data"]["Current_A"] = \
+            np.delete(data["lt_data"]["Current_A"], np.s_[::2], 1)
+        data["lt_data"]["Resistance_ohm"] = \
+            np.delete(data["lt_data"]["Resistance_ohm"], np.s_[::2], 1)
+    data["meas_count"] = data["lt_data"]["Level_mm"].shape[1]
+    return data
+
+
 def calc_resistivity(data, settings):
     """ ___ """
 
@@ -150,6 +176,8 @@ def init_logger(settings):
     LOGGER.setLevel(settings["GENERAL"]["LOGGING_LEVEL"])
     logging.getLogger("plot_bokeh").setLevel(
         settings["GENERAL"]["LOGGING_LEVEL"])
+    logging.getLogger("plot_plotly").setLevel(
+        settings["GENERAL"]["LOGGING_LEVEL"])
 
     LOGGER.debug("python %s", sys.version.split(" ")[0])
     LOGGER.debug("numpy %s", np.__version__)
@@ -158,6 +186,7 @@ def init_logger(settings):
 def plot_with_bokeh(settings, data):
     """ ___ """
 
+    start_time = time.time()
     plotb = PlotBokeh(settings, data)
     plotb.title()
     plotb.plot_current_vs_time()
@@ -166,6 +195,26 @@ def plot_with_bokeh(settings, data):
     plotb.plot_resistivity_vs_time()
     plotb.plot_resistance_vs_current()
     plotb.write_to_html_file()
+    total_time = time.time() - start_time
+    LOGGER.debug("Bokeh time for %s : %0.1f s",
+                 data["lt_name"], total_time)
+
+
+def plot_with_plotly(settings, data):
+    """ ___ """
+
+    start_time = time.time()
+    plotp = PlotPlotly(settings, data)
+    plotp.title()
+    plotp.plot_current_vs_time()
+    plotp.plot_resistance_vs_time()
+    plotp.plot_level_vs_time()
+    plotp.plot_resistivity_vs_time()
+    plotp.plot_resistance_vs_current()
+    plotp.write_to_html_file()
+    total_time = time.time() - start_time
+    LOGGER.debug("Plotly time for %s : %0.1f s",
+                 data["lt_name"], total_time)
 
 
 def read_settings():
@@ -193,10 +242,22 @@ def main():
         # Read data and calculate resistivity.
         LOGGER.debug("Processing %s", data_file)
         data = read_data(data_file, settings)
+        remove_data = False
+        if remove_data:
+            data = remove_data_for_faster_processing(data)
         data = calc_resistivity(data, settings)
 
         # Plot with Bokeh.
-        plot_with_bokeh(settings, data)
+        if settings["BOKEH"]["DO_IT"]:
+            plot_with_bokeh(settings, data)
+        else:
+            LOGGER.debug("Skipping Bokeh plot.")
+
+        # Plot with Plotly.
+        if settings["PLOTLY"]["DO_IT"]:
+            plot_with_plotly(settings, data)
+        else:
+            LOGGER.debug("Skipping Plotly plot.")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,18 @@
+/*
+<link rel="stylesheet" type="text/css" href="../style.css">
+*/
+
+@page {
+    size: 210mm 297mm;
+    margin: 0px;
+}
+
+div.bk-canvas-events {
+    page-break-inside: avoid !important;
+    border: 10px solid blue !important;
+}
+
+div.bk-canvas-events:nth-child(2) {
+    page-break-before: avoid !important;
+    border: 10px solid red !important;
+}
