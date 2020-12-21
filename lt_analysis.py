@@ -107,7 +107,7 @@ def calc_resistivity(data, settings):
     """ ___ """
 
     # Suppress “divide by zero” warning.
-    # This is a very bad approch. Better would be to check
+    # This is a very bad approach. Better would be to check
     # when `levels >= LT_MAX_LEVEL` and return `resistivity = NaN`.
     # TODO: Check `levels >= LT_MAX_LEVEL`.
     with warnings.catch_warnings(record=True) as _w:
