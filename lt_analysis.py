@@ -5,7 +5,7 @@
 
 LT ANALYSIS
 
-This module shows some basic plotting techniques with Bokeh.
+This module shows some basic plotting techniques with Bokeh and Plotly.
 
 @author         Nicolas Jeanmonod
 @date           2020-02-16
@@ -30,12 +30,13 @@ SETTINGS = {
     "GENERAL": {
         "DATA_DIR": "./data/",
         "DATA_FILES": ["LT01", "LT30"],
+        "REMOVE_DATA_FOR_FASTER_PROCESSING": False,
         "LT_MAX_LEVEL": 400,
         "PLOT_WIDTH": 1200,
-        "PLOT_HEIGHT": 400,
+        "PLOT_HEIGHT": 650,
         "LOGGING_ENABLED": True,
         "LOGGING_LEVEL": 10,
-        "SHOW_HTML": True,
+        "SHOW_HTML": False,
         "COLORS": ("#30123b", "#c0f233", "#3c3285", "#dae236", "#4353c2",
                    "#f0cb3a", "#4670e8", "#fbb336", "#438efd", "#fd9229",
                    "#34aaf8", "#f76e1a", "#20c6df", "#ea500d", "#17debf",
@@ -62,6 +63,8 @@ LOGGER = logging.getLogger(__name__)
 
 def read_data(data_file, settings):
     """ ___ """
+
+    LOGGER.debug("Processing %s", data_file)
 
     file_name = settings["GENERAL"]["DATA_DIR"] + data_file + ".xml"
     tree = ET.parse(file_name)
@@ -108,6 +111,9 @@ def read_data(data_file, settings):
         "level_count": level_count,
     }
 
+    if SETTINGS["GENERAL"]["REMOVE_DATA_FOR_FASTER_PROCESSING"]:
+        data = remove_data_for_faster_processing(data)
+
     return data
 
 
@@ -132,20 +138,15 @@ def remove_data_for_faster_processing(data):
 def calc_resistivity(data, settings):
     """ ___ """
 
-    # Suppress “divide by zero” warning.
-    # This is a very bad approach. Better would be to check
-    # when `levels >= LT_MAX_LEVEL` and return `resistivity = NaN`.
-    # TODO: Check `levels >= LT_MAX_LEVEL`.
-    with warnings.catch_warnings(record=True) as _w:
-        warnings.simplefilter("always")
-        data["lt_data"]["resistivity"] = data["lt_data"]["Resistance_ohm"] / \
-            (settings["GENERAL"]["LT_MAX_LEVEL"] - data["lt_data"]["Level_mm"])
-        if len(_w) == 1 \
-                and issubclass(_w[-1].category, RuntimeWarning) \
-                and "divide by zero" in str(_w[-1].message):
-            LOGGER.debug(
-                '%s — Some resistivity values cannot be calculated'
-                ' because "Level = Max Height"', data["lt_name"])
+    # Levels equal to or higher than the LT max level are set to NaN.
+    # This is because the resistivity is not defined when `level >= max_level`.
+    filt_levels = np.copy(data["lt_data"]["Level_mm"])
+    max_level = settings["GENERAL"]["LT_MAX_LEVEL"]
+    filt_levels[filt_levels >= max_level] = np.nan
+
+    # Calculate resistivity with filtered levels.
+    data["lt_data"]["resistivity"] = data["lt_data"]["Resistance_ohm"] / \
+        (settings["GENERAL"]["LT_MAX_LEVEL"] - filt_levels)
 
     return data
 
@@ -186,15 +187,13 @@ def init_logger(settings):
 def plot_with_bokeh(settings, data):
     """ ___ """
 
+    if not settings["PLOTLY"]["DO_IT"]:
+        LOGGER.debug("Skipping Plotly plot.")
+        return
+
     start_time = time.time()
     plotb = PlotBokeh(settings, data)
-    plotb.title()
-    plotb.plot_current_vs_time()
-    plotb.plot_resistance_vs_time()
-    plotb.plot_level_vs_time()
-    plotb.plot_resistivity_vs_time()
-    plotb.plot_resistance_vs_current()
-    plotb.write_to_html_file()
+    do_plots(plotb)
     total_time = time.time() - start_time
     LOGGER.debug("Bokeh time for %s : %0.1f s",
                  data["lt_name"], total_time)
@@ -203,18 +202,28 @@ def plot_with_bokeh(settings, data):
 def plot_with_plotly(settings, data):
     """ ___ """
 
+    if not settings["BOKEH"]["DO_IT"]:
+        LOGGER.debug("Skipping Bokeh plot.")
+        return
+
     start_time = time.time()
     plotp = PlotPlotly(settings, data)
-    plotp.title()
-    plotp.plot_current_vs_time()
-    plotp.plot_resistance_vs_time()
-    plotp.plot_level_vs_time()
-    plotp.plot_resistivity_vs_time()
-    plotp.plot_resistance_vs_current()
-    plotp.write_to_html_file()
+    do_plots(plotp)
     total_time = time.time() - start_time
     LOGGER.debug("Plotly time for %s : %0.1f s",
                  data["lt_name"], total_time)
+
+
+def do_plots(plt):
+    """ ___ """
+
+    plt.title()
+    plt.plot_current_vs_time()
+    plt.plot_resistance_vs_time()
+    plt.plot_level_vs_time()
+    plt.plot_resistivity_vs_time()
+    plt.plot_resistance_vs_current()
+    plt.write_to_html_file()
 
 
 def read_settings():
@@ -240,24 +249,14 @@ def main():
     for data_file in settings["GENERAL"]["DATA_FILES"]:
 
         # Read data and calculate resistivity.
-        LOGGER.debug("Processing %s", data_file)
         data = read_data(data_file, settings)
-        remove_data = False
-        if remove_data:
-            data = remove_data_for_faster_processing(data)
         data = calc_resistivity(data, settings)
 
-        # Plot with Bokeh.
-        if settings["BOKEH"]["DO_IT"]:
-            plot_with_bokeh(settings, data)
-        else:
-            LOGGER.debug("Skipping Bokeh plot.")
-
         # Plot with Plotly.
-        if settings["PLOTLY"]["DO_IT"]:
-            plot_with_plotly(settings, data)
-        else:
-            LOGGER.debug("Skipping Plotly plot.")
+        plot_with_plotly(settings, data)
+
+        # Plot with Bokeh.
+        plot_with_bokeh(settings, data)
 
 
 if __name__ == "__main__":

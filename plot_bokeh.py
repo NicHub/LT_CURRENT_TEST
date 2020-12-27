@@ -18,9 +18,9 @@ import os
 
 import bokeh
 from bokeh.layouts import column
-from bokeh.models import ColumnDataSource, NumeralTickFormatter, Title
-from bokeh.plotting import figure, output_file, save, show
+from bokeh.models import ColumnDataSource, Legend, NumeralTickFormatter, Title
 from bokeh.models.widgets import Div
+from bokeh.plotting import figure, output_file, save, show
 
 
 class PlotBokeh():
@@ -45,19 +45,17 @@ class PlotBokeh():
 
         title = Div(
             text=f"""
-        <h1 style="
-            text-align: center;
-            font-weight: 100;
-            text-transform: uppercase;
-            font-family: "Ubuntu Mono", monospace;
-            >
-            {self.__data["lt_name"]} Measurements
-        </h1>""",
-            sizing_mode="stretch_width",
-            height=100)
-
-        title.margin = self.__plot_margin
-
+                <h1>{self.__data["lt_name"]} Measurements</h1>
+                <h2>Plotted with Bokeh</h2>
+                """,
+            style={
+                "width": "100%",
+                "height": "100px",
+                "text-align": "center",
+                "text-transform": "uppercase"
+            },
+            margin=self.__plot_margin
+        )
         self.__html_elems.append(title)
 
     def plot_current_vs_time(self):
@@ -67,20 +65,24 @@ class PlotBokeh():
         # Create figure, prepare data source and plot data.
         #
         plt = figure(tools=self.__settings["BOKEH"]["TOOLS"])
+        legend_labels = []
 
         for level in range(self.__data["level_count"]):
             _t = self.__data["lt_data"]["KeithleyTimeStamp"][level]
             _y = self.__data["lt_data"]["Current_A"][level]
             data_source = ColumnDataSource(data=dict(t=_t, y=_y))
 
-            plt.line("t", "y", source=data_source,
-                     color=self.__settings["GENERAL"]["COLORS"][level],
-                     legend_label="Current (A)",
-                     alpha=self.__settings["BOKEH"]["ALPHA_1"])
-            plt.circle("t", "y", source=data_source,
-                       color=self.__settings["GENERAL"]["COLORS"][level],
-                       size=self.__settings["BOKEH"]["CIRCLE_SIZE"],
-                       alpha=self.__settings["BOKEH"]["ALPHA_6"])
+            pl = plt.line("t", "y", source=data_source,
+                          color=self.__settings["GENERAL"]["COLORS"][level],
+                          alpha=self.__settings["BOKEH"]["ALPHA_1"])
+            pc = plt.circle("t", "y", source=data_source,
+                            color=self.__settings["GENERAL"]["COLORS"][level],
+                            size=self.__settings["BOKEH"]["CIRCLE_SIZE"],
+                            alpha=self.__settings["BOKEH"]["ALPHA_6"])
+
+            level_val = self.__data["lt_data"]["Level_mm"][level][0]
+            legend_label = f"I(t) @ L{level_val:0.0f}mm"
+            legend_labels.append((legend_label, [pl, pc]))
 
         #
         # Format plot.
@@ -98,6 +100,9 @@ class PlotBokeh():
         plt.yaxis.axis_label = "Current (A)"
         plt.yaxis.formatter = NumeralTickFormatter(format="0.000")
         plt.margin = self.__plot_margin
+        legend = Legend(items=legend_labels, location="top_center")
+        plt.add_layout(legend, "right")
+        plt.legend.click_policy = "hide"
 
         #
         # Append plot to HTML elements for final report.
@@ -111,20 +116,24 @@ class PlotBokeh():
         # Create figure, prepare data source and plot data.
         #
         plt = figure(tools=self.__settings["BOKEH"]["TOOLS"])
+        legend_labels = []
 
         for level in range(self.__data["level_count"]):
             _t = self.__data["lt_data"]["KeithleyTimeStamp"][level]
             _y = self.__data["lt_data"]["Resistance_ohm"][level]
             data_source = ColumnDataSource(data=dict(t=_t, y=_y))
 
-            plt.line("t", "y", source=data_source,
-                     color=self.__settings["GENERAL"]["COLORS"][level],
-                     legend_label="Resistance (Ω)",
-                     alpha=self.__settings["BOKEH"]["ALPHA_1"])
-            plt.circle("t", "y", source=data_source,
-                       color=self.__settings["GENERAL"]["COLORS"][level],
-                       size=self.__settings["BOKEH"]["CIRCLE_SIZE"],
-                       alpha=self.__settings["BOKEH"]["ALPHA_6"])
+            pl = plt.line("t", "y", source=data_source,
+                          color=self.__settings["GENERAL"]["COLORS"][level],
+                          alpha=self.__settings["BOKEH"]["ALPHA_1"])
+            pc = plt.circle("t", "y", source=data_source,
+                            color=self.__settings["GENERAL"]["COLORS"][level],
+                            size=self.__settings["BOKEH"]["CIRCLE_SIZE"],
+                            alpha=self.__settings["BOKEH"]["ALPHA_6"])
+
+            level_val = self.__data["lt_data"]["Level_mm"][level][0]
+            legend_label = f"R(t) @ L{level_val:0.0f}mm"
+            legend_labels.append((legend_label, [pl, pc]))
 
         #
         # Format plot.
@@ -143,6 +152,9 @@ class PlotBokeh():
         plt.yaxis.formatter = NumeralTickFormatter(format="0")
         plt.x_range = self.__html_elems[self.__master_x_range].x_range
         plt.margin = self.__plot_margin
+        legend = Legend(items=legend_labels, location="top_center")
+        plt.add_layout(legend, "right")
+        plt.legend.click_policy = "hide"
 
         #
         # Append plot to HTML elements for final report.
@@ -156,20 +168,24 @@ class PlotBokeh():
         # Create figure, prepare data source and plot data.
         #
         plt = figure(tools=self.__settings["BOKEH"]["TOOLS"])
+        legend_labels = []
 
         for level in range(self.__data["level_count"]):
             _t = self.__data["lt_data"]["KeithleyTimeStamp"][level]
             _y = self.__data["lt_data"]["Level_mm"][level]
             data_source = ColumnDataSource(data=dict(t=_t, y=_y))
 
-            plt.line("t", "y", source=data_source,
-                     color=self.__settings["GENERAL"]["COLORS"][level],
-                     legend_label="Level (mm)",
-                     alpha=self.__settings["BOKEH"]["ALPHA_1"])
-            plt.circle("t", "y", source=data_source,
-                       color=self.__settings["GENERAL"]["COLORS"][level],
-                       size=self.__settings["BOKEH"]["CIRCLE_SIZE"],
-                       alpha=self.__settings["BOKEH"]["ALPHA_6"])
+            pl = plt.line("t", "y", source=data_source,
+                          color=self.__settings["GENERAL"]["COLORS"][level],
+                          alpha=self.__settings["BOKEH"]["ALPHA_1"])
+            pc = plt.circle("t", "y", source=data_source,
+                            color=self.__settings["GENERAL"]["COLORS"][level],
+                            size=self.__settings["BOKEH"]["CIRCLE_SIZE"],
+                            alpha=self.__settings["BOKEH"]["ALPHA_6"])
+
+            level_val = self.__data["lt_data"]["Level_mm"][level][0]
+            legend_label = f"L(t) @ L{level_val:0.0f}mm"
+            legend_labels.append((legend_label, [pl, pc]))
 
         #
         # Format plot.
@@ -188,6 +204,9 @@ class PlotBokeh():
         plt.yaxis.formatter = NumeralTickFormatter(format="0")
         plt.x_range = self.__html_elems[self.__master_x_range].x_range
         plt.margin = self.__plot_margin
+        legend = Legend(items=legend_labels, location="top_center")
+        plt.add_layout(legend, "right")
+        plt.legend.click_policy = "hide"
 
         #
         # Append plot to HTML elements for final report.
@@ -201,20 +220,24 @@ class PlotBokeh():
         # Create figure, prepare data source and plot data.
         #
         plt = figure(tools=self.__settings["BOKEH"]["TOOLS"])
+        legend_labels = []
 
         for level in range(self.__data["level_count"]):
             _t = self.__data["lt_data"]["KeithleyTimeStamp"][level]
             _y = self.__data["lt_data"]["resistivity"][level]
             data_source = ColumnDataSource(data=dict(t=_t, y=_y))
 
-            plt.line("t", "y", source=data_source,
-                     color=self.__settings["GENERAL"]["COLORS"][level],
-                     legend_label="Resistivity (Ω/mm)",
-                     alpha=self.__settings["BOKEH"]["ALPHA_1"])
-            plt.circle("t", "y", source=data_source,
-                       color=self.__settings["GENERAL"]["COLORS"][level],
-                       size=self.__settings["BOKEH"]["CIRCLE_SIZE"],
-                       alpha=self.__settings["BOKEH"]["ALPHA_6"])
+            pl = plt.line("t", "y", source=data_source,
+                          color=self.__settings["GENERAL"]["COLORS"][level],
+                          alpha=self.__settings["BOKEH"]["ALPHA_1"])
+            pc = plt.circle("t", "y", source=data_source,
+                            color=self.__settings["GENERAL"]["COLORS"][level],
+                            size=self.__settings["BOKEH"]["CIRCLE_SIZE"],
+                            alpha=self.__settings["BOKEH"]["ALPHA_6"])
+
+            level_val = self.__data["lt_data"]["Level_mm"][level][0]
+            legend_label = f"ϱ(t) @ L{level_val:0.0f}mm"
+            legend_labels.append((legend_label, [pl, pc]))
 
         #
         # Format plot.
@@ -233,6 +256,9 @@ class PlotBokeh():
         plt.yaxis.formatter = NumeralTickFormatter(format="0.000")
         plt.x_range = self.__html_elems[self.__master_x_range].x_range
         plt.margin = self.__plot_margin
+        legend = Legend(items=legend_labels, location="top_center")
+        plt.add_layout(legend, "right")
+        plt.legend.click_policy = "hide"
 
         #
         # Append plot to HTML elements for final report.
@@ -246,24 +272,24 @@ class PlotBokeh():
         # Create figure, prepare data source and plot data.
         #
         plt = figure(tools=self.__settings["BOKEH"]["TOOLS"])
+        legend_labels = []
 
         for level in range(self.__data["level_count"]):
             _i = self.__data["lt_data"]["Current_A"][level]
             _r = self.__data["lt_data"]["Resistance_ohm"][level]
             data_source = ColumnDataSource(data=dict(i=_i, r=_r))
 
-            level_val = self.__data["lt_data"]["Level_mm"][level][0]
-            legend_label = f'R(I) @ L{level_val:0.0f}mm (Ω)'
+            pl = plt.line("i", "r", source=data_source,
+                          color=self.__settings["GENERAL"]["COLORS"][level],
+                          alpha=self.__settings["BOKEH"]["ALPHA_6"])
+            pc = plt.circle("i", "r", source=data_source,
+                            color=self.__settings["GENERAL"]["COLORS"][level],
+                            size=self.__settings["BOKEH"]["CIRCLE_SIZE"],
+                            alpha=self.__settings["BOKEH"]["ALPHA_1"])
 
-            plt.line("i", "r", source=data_source,
-                     color=self.__settings["GENERAL"]["COLORS"][level],
-                     legend_label=legend_label,
-                     alpha=self.__settings["BOKEH"]["ALPHA_6"])
-            plt.circle("i", "r", source=data_source,
-                       color=self.__settings["GENERAL"]["COLORS"][level],
-                       legend_label=legend_label,
-                       size=self.__settings["BOKEH"]["CIRCLE_SIZE"],
-                       alpha=self.__settings["BOKEH"]["ALPHA_1"])
+            level_val = self.__data["lt_data"]["Level_mm"][level][0]
+            legend_label = f"R(I) @ L{level_val:0.0f}mm"
+            legend_labels.append((legend_label, [pl, pc]))
 
         #
         # Format plot.
@@ -281,7 +307,8 @@ class PlotBokeh():
         plt.yaxis.axis_label = "Resistance (Ω)"
         plt.yaxis.formatter = NumeralTickFormatter(format="0")
         plt.margin = self.__plot_margin
-        plt.legend.location = "top_left"
+        legend = Legend(items=legend_labels, location="top_center")
+        plt.add_layout(legend, "right")
         plt.legend.click_policy = "hide"
 
         #
@@ -302,11 +329,12 @@ class PlotBokeh():
 
         file_name = self.__settings["BOKEH"]["OUT_DIR"] + \
             self.__data["lt_name"] + ".html"
-        output_file(file_name, title=f'{self.__data["lt_name"]}')
+        output_file(file_name, title=f'{self.__data["lt_name"]} • Bokeh')
 
         html_out = column(children=self.__html_elems,
                           sizing_mode="stretch_width")
 
+        # show and save are very slow (> 1 s).
         if self.__settings["GENERAL"]["SHOW_HTML"]:
             show(html_out)
         else:

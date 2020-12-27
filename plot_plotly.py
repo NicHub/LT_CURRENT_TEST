@@ -22,6 +22,8 @@ Plotly documentation
 
 import logging
 import os
+import subprocess
+import sys
 
 import plotly as py
 import plotly.graph_objs as go
@@ -120,15 +122,13 @@ class PlotPlotly():
         """ ___ """
 
         title = f"""
-<div style="margin-bottom:50px;">
-    <h1 style="
-        text-align: center;
-        width: 100%;
-        font-weight: 100;
-        text-transform: uppercase;
-        font-family: 'Ubuntu Mono', monospace">
-        {self.__data["lt_name"]} Measurements
-    </h1>
+<div style="
+     margin-bottom:50px;
+     text-align: center;
+     font-family: 'PT Sans', monospace;
+     text-transform: uppercase;">
+    <h1>{self.__data["lt_name"]} Measurements</h1>
+    <h2>Plotted with Plotly</h2>
 </div>
 """
         self.__html_elems.append(title)
@@ -148,7 +148,7 @@ class PlotPlotly():
         data = []
         for level in range(self.__data["level_count"]):
             level_val = self.__data["lt_data"]["Level_mm"][level][0]
-            legend_label = f'I(t) @ L{level_val:0.0f}mm (mm)'
+            legend_label = f"I(t) @ L{level_val:0.0f}mm"
             trace = go.Scatter(
                 x=_x[level],
                 y=_y[level],
@@ -178,9 +178,10 @@ class PlotPlotly():
                 "text":
                 f'<span style="font-weight:bold; text-transform:uppercase">'
                 f'{self.__data["lt_name"]} — Current vs time',
-                "xanchor": "center",
                 "x": 0.5,
-                "y": 0.85,
+                "y": 0.9,
+                "xanchor": "center",
+                "yanchor": "top",
             },
             plot_bgcolor=self.__COLORS["background"],
             paper_bgcolor=self.__COLORS["background"],
@@ -192,7 +193,6 @@ class PlotPlotly():
                    "showgrid": True, "gridcolor": "rgba(0, 0, 0, 0.1)",
                    "ticks": "inside",  "showline": True, "linewidth": 1,
                    "linecolor": "black", "mirror": True},
-            legend={"x": 0, "y": 1},
             hovermode="closest",
             height=self.__settings["GENERAL"]["PLOT_HEIGHT"],
             width=self.__settings["GENERAL"]["PLOT_WIDTH"],
@@ -223,7 +223,7 @@ class PlotPlotly():
         data = []
         for level in range(self.__data["level_count"]):
             level_val = self.__data["lt_data"]["Level_mm"][level][0]
-            legend_label = f'R(t) @ L{level_val:0.0f}mm (mm)'
+            legend_label = f"R(t) @ L{level_val:0.0f}mm"
             trace = go.Scatter(
                 x=_x[level],
                 y=_y[level],
@@ -253,9 +253,10 @@ class PlotPlotly():
                 "text":
                 f'<span style="font-weight:bold; text-transform:uppercase">'
                 f'{self.__data["lt_name"]} — Resistance vs time',
-                "xanchor": "center",
                 "x": 0.5,
-                "y": 0.85,
+                "y": 0.9,
+                "xanchor": "center",
+                "yanchor": "top",
             },
             plot_bgcolor=self.__COLORS["background"],
             paper_bgcolor=self.__COLORS["background"],
@@ -267,7 +268,6 @@ class PlotPlotly():
                    "showgrid": True, "gridcolor": "rgba(0, 0, 0, 0.1)",
                    "ticks": "inside",  "showline": True, "linewidth": 1,
                    "linecolor": "black", "mirror": True},
-            legend={"x": 0, "y": 1},
             hovermode="closest",
             height=self.__settings["GENERAL"]["PLOT_HEIGHT"],
             width=self.__settings["GENERAL"]["PLOT_WIDTH"],
@@ -298,7 +298,7 @@ class PlotPlotly():
         data = []
         for level in range(self.__data["level_count"]):
             level_val = self.__data["lt_data"]["Level_mm"][level][0]
-            legend_label = f'L(t) @ L{level_val:0.0f}mm (mm)'
+            legend_label = f"L(t) @ L{level_val:0.0f}mm"
             trace = go.Scatter(
                 x=_x[level],
                 y=_y[level],
@@ -328,9 +328,10 @@ class PlotPlotly():
                 "text":
                 f'<span style="font-weight:bold; text-transform:uppercase">'
                 f'{self.__data["lt_name"]} — Level vs time',
-                "xanchor": "center",
                 "x": 0.5,
-                "y": 0.85,
+                "y": 0.9,
+                "xanchor": "center",
+                "yanchor": "top",
             },
             plot_bgcolor=self.__COLORS["background"],
             paper_bgcolor=self.__COLORS["background"],
@@ -342,7 +343,6 @@ class PlotPlotly():
                    "showgrid": True, "gridcolor": "rgba(0, 0, 0, 0.1)",
                    "ticks": "inside",  "showline": True, "linewidth": 1,
                    "linecolor": "black", "mirror": True},
-            legend={"x": 0, "y": 1},
             hovermode="closest",
             height=self.__settings["GENERAL"]["PLOT_HEIGHT"],
             width=self.__settings["GENERAL"]["PLOT_WIDTH"],
@@ -373,7 +373,7 @@ class PlotPlotly():
         data = []
         for level in range(self.__data["level_count"]):
             level_val = self.__data["lt_data"]["Level_mm"][level][0]
-            legend_label = f'ρ(t) @ L{level_val:0.0f}mm (Ω/mm)'
+            legend_label = f"ϱ(t) @ L{level_val:0.0f}mm"
             trace = go.Scatter(
                 x=_x[level],
                 y=_y[level],
@@ -403,9 +403,10 @@ class PlotPlotly():
                 "text":
                 f'<span style="font-weight:bold; text-transform:uppercase">'
                 f'{self.__data["lt_name"]} — Resistivity vs time',
-                "xanchor": "center",
                 "x": 0.5,
-                "y": 0.85,
+                "y": 0.9,
+                "xanchor": "center",
+                "yanchor": "top",
             },
             plot_bgcolor=self.__COLORS["background"],
             paper_bgcolor=self.__COLORS["background"],
@@ -417,7 +418,6 @@ class PlotPlotly():
                    "showgrid": True, "gridcolor": "rgba(0, 0, 0, 0.1)",
                    "ticks": "inside",  "showline": True, "linewidth": 1,
                    "linecolor": "black", "mirror": True},
-            legend={"x": 0, "y": 1},
             hovermode="closest",
             height=self.__settings["GENERAL"]["PLOT_HEIGHT"],
             width=self.__settings["GENERAL"]["PLOT_WIDTH"],
@@ -448,7 +448,7 @@ class PlotPlotly():
         data = []
         for level in range(self.__data["level_count"]):
             level_val = self.__data["lt_data"]["Level_mm"][level][0]
-            legend_label = f'R(I) @ L{level_val:0.0f}mm (Ω)'
+            legend_label = f"R(I) @ L{level_val:0.0f}mm"
             trace = go.Scatter(
                 x=_x[level],
                 y=_y[level],
@@ -478,9 +478,10 @@ class PlotPlotly():
                 "text":
                 f'<span style="font-weight:bold; text-transform:uppercase">'
                 f'{self.__data["lt_name"]} — Resistance vs current</span>',
-                "xanchor": "center",
                 "x": 0.5,
                 "y": 0.95,
+                "xanchor": "center",
+                "yanchor": "top",
             },
             plot_bgcolor=self.__COLORS["background"],
             paper_bgcolor=self.__COLORS["background"],
@@ -492,7 +493,6 @@ class PlotPlotly():
                    "showgrid": True, "gridcolor": "rgba(0, 0, 0, 0.1)",
                    "ticks": "inside",  "showline": True, "linewidth": 1,
                    "linecolor": "black", "mirror": True},
-            legend={"x": 0, "y": 1},
             hovermode="closest",
             height=self.__settings["GENERAL"]["PLOT_WIDTH"],
             width=self.__settings["GENERAL"]["PLOT_WIDTH"],
@@ -507,6 +507,13 @@ class PlotPlotly():
             include_mathjax=False,
             config={"scrollZoom": False})
         self.__html_elems.append(fig)
+
+    def open_file(self, filename):
+        if sys.platform == "win32":
+            os.startfile(filename)
+        else:
+            opener = "open" if sys.platform == "darwin" else "xdg-open"
+            subprocess.call([opener, filename])
 
     def write_to_html_file(self):
         """ ___ """
@@ -523,13 +530,13 @@ class PlotPlotly():
             self.__data["lt_name"] + ".html"
 
         #
-        # Save the report and display it if showHTML == True
+        # Save the report and display it if SHOW_HTML == True
         #
         start_html = f"""<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<title>{self.__data["lt_name"]}</title>
+<title>{self.__data["lt_name"]} • Plotly</title>
 <style>
 .centered{{width:{self.__settings["GENERAL"]["PLOT_WIDTH"]}px; margin: 0 auto; text-align: center;}}
 .page-break-inside-avoid{{page-break-inside: avoid;}}
@@ -546,3 +553,6 @@ class PlotPlotly():
             inner_html += '</div>'
             html_file.write(inner_html)
         html_file.write(end_html)
+
+        if self.__settings["GENERAL"]["SHOW_HTML"]:
+            self.open_file(file_name)
