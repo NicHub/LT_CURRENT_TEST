@@ -46,7 +46,7 @@ class PlotBokeh():
         title = Div(
             text=f"""
                 <h1>{self.__data["lt_name"]} Measurements</h1>
-                <h2>Plotted with Bokeh</h2>
+                <h2>Bokeh plots</h2>
                 """,
             style={
                 "width": "100%",

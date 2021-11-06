@@ -128,7 +128,7 @@ class PlotPlotly():
      font-family: 'PT Sans', monospace;
      text-transform: uppercase;">
     <h1>{self.__data["lt_name"]} Measurements</h1>
-    <h2>Plotted with Plotly</h2>
+    <h2>Plotly plots</h2>
 </div>
 """
         self.__html_elems.append(title)
