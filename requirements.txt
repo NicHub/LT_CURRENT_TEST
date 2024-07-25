@@ -1,0 +1,6 @@
+# python3 -m pip install --upgrade pip
+# python3 -m pip install --upgrade -r requirements.txt
+
+bokeh>=3.5.0
+numpy>=1.26.4
+plotly>=5.23.0

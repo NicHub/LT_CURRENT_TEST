@@ -14,18 +14,17 @@ This module shows some basic plotting techniques with Bokeh and Plotly.
 
 
 import logging
+import numpy as np
 import sys
 import time
-import warnings
 import xml.etree.ElementTree as ET
-
-import numpy as np
 
 from plot_bokeh import PlotBokeh
 from plot_plotly import PlotPlotly
 
 
 # User choices.
+# fmt: off
 SETTINGS = {
     "GENERAL": {
         "DATA_DIR": "./data/",
@@ -56,13 +55,14 @@ SETTINGS = {
         "OUT_DIR": "./out_python_plotly/",
     }
 }
+# fmt: on
 
 # Global variables.
 LOGGER = logging.getLogger(__name__)
 
 
 def read_data(data_file, settings):
-    """ ___ """
+    """___"""
 
     LOGGER.debug("Processing %s", data_file)
 
@@ -92,11 +92,13 @@ def read_data(data_file, settings):
             meas_count, level_count = int(meas_count), int(level_count)
 
             if reshape:
-                lt_data[child.tag] = np.asarray(_elem.text.split(" ")).astype(
-                    "float64").reshape(level_count, meas_count)
+                lt_data[child.tag] = (
+                    np.asarray(_elem.text.split(" "))
+                    .astype("float64")
+                    .reshape(level_count, meas_count)
+                )
             else:
-                lt_data[child.tag] = np.asarray(
-                    _elem.text.split(" ")).astype("float64")
+                lt_data[child.tag] = np.asarray(_elem.text.split(" ")).astype("float64")
 
     if reshape:
         lt_data["KeithleyTimeStamp"] -= lt_data["KeithleyTimeStamp"][0][0]
@@ -118,25 +120,30 @@ def read_data(data_file, settings):
 
 
 def remove_data_for_faster_processing(data):
-    """ ___ """
+    """___"""
 
     for _i in range(3):
-        data["lt_data"]["Level_mm"] = \
-            np.delete(data["lt_data"]["Level_mm"], np.s_[::2], 1)
-        data["lt_data"]["Voltage_V"] = \
-            np.delete(data["lt_data"]["Voltage_V"], np.s_[::2], 1)
-        data["lt_data"]["KeithleyTimeStamp"] = \
-            np.delete(data["lt_data"]["KeithleyTimeStamp"], np.s_[::2], 1)
-        data["lt_data"]["Current_A"] = \
-            np.delete(data["lt_data"]["Current_A"], np.s_[::2], 1)
-        data["lt_data"]["Resistance_ohm"] = \
-            np.delete(data["lt_data"]["Resistance_ohm"], np.s_[::2], 1)
+        data["lt_data"]["Level_mm"] = np.delete(
+            data["lt_data"]["Level_mm"], np.s_[::2], 1
+        )
+        data["lt_data"]["Voltage_V"] = np.delete(
+            data["lt_data"]["Voltage_V"], np.s_[::2], 1
+        )
+        data["lt_data"]["KeithleyTimeStamp"] = np.delete(
+            data["lt_data"]["KeithleyTimeStamp"], np.s_[::2], 1
+        )
+        data["lt_data"]["Current_A"] = np.delete(
+            data["lt_data"]["Current_A"], np.s_[::2], 1
+        )
+        data["lt_data"]["Resistance_ohm"] = np.delete(
+            data["lt_data"]["Resistance_ohm"], np.s_[::2], 1
+        )
     data["meas_count"] = data["lt_data"]["Level_mm"].shape[1]
     return data
 
 
 def calc_resistivity(data, settings):
-    """ ___ """
+    """___"""
 
     # Levels equal to or higher than the LT max level are set to NaN.
     # This is because the resistivity is not defined when `level >= max_level`.
@@ -145,8 +152,9 @@ def calc_resistivity(data, settings):
     filt_levels[filt_levels >= max_level] = np.nan
 
     # Calculate resistivity with filtered levels.
-    data["lt_data"]["resistivity"] = data["lt_data"]["Resistance_ohm"] / \
-        (settings["GENERAL"]["LT_MAX_LEVEL"] - filt_levels)
+    data["lt_data"]["resistivity"] = data["lt_data"]["Resistance_ohm"] / (
+        settings["GENERAL"]["LT_MAX_LEVEL"] - filt_levels
+    )
 
     return data
 
@@ -165,27 +173,27 @@ def init_logger(settings):
         logging.disable(50)
         return
 
-    logging.basicConfig(stream=sys.stdout,
-                        format="%(asctime)-s "
-                        "%(levelno)-s "
-                        "%(module)-14s"
-                        "%(funcName)-30s:"
-                        "%(lineno)-3s : "
-                        "%(message)s",
-                        datefmt="%Y-%m-%d %H:%M:%S")
+    logging.basicConfig(
+        stream=sys.stdout,
+        format="%(asctime)-s "
+        "%(levelno)-s "
+        "%(module)-14s"
+        "%(funcName)-30s:"
+        "%(lineno)-3s : "
+        "%(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
 
     LOGGER.setLevel(settings["GENERAL"]["LOGGING_LEVEL"])
-    logging.getLogger("plot_bokeh").setLevel(
-        settings["GENERAL"]["LOGGING_LEVEL"])
-    logging.getLogger("plot_plotly").setLevel(
-        settings["GENERAL"]["LOGGING_LEVEL"])
+    logging.getLogger("plot_bokeh").setLevel(settings["GENERAL"]["LOGGING_LEVEL"])
+    logging.getLogger("plot_plotly").setLevel(settings["GENERAL"]["LOGGING_LEVEL"])
 
     LOGGER.debug("python %s", sys.version.split(" ")[0])
     LOGGER.debug("numpy %s", np.__version__)
 
 
 def plot_with_bokeh(settings, data):
-    """ ___ """
+    """___"""
 
     if not settings["PLOTLY"]["DO_IT"]:
         LOGGER.debug("Skipping Plotly plot.")
@@ -195,12 +203,11 @@ def plot_with_bokeh(settings, data):
     plotb = PlotBokeh(settings, data)
     do_plots(plotb)
     total_time = time.time() - start_time
-    LOGGER.debug("Bokeh time for %s : %0.1f s",
-                 data["lt_name"], total_time)
+    LOGGER.debug("Bokeh time for %s : %0.1f s", data["lt_name"], total_time)
 
 
 def plot_with_plotly(settings, data):
-    """ ___ """
+    """___"""
 
     if not settings["BOKEH"]["DO_IT"]:
         LOGGER.debug("Skipping Bokeh plot.")
@@ -210,12 +217,11 @@ def plot_with_plotly(settings, data):
     plotp = PlotPlotly(settings, data)
     do_plots(plotp)
     total_time = time.time() - start_time
-    LOGGER.debug("Plotly time for %s : %0.1f s",
-                 data["lt_name"], total_time)
+    LOGGER.debug("Plotly time for %s : %0.1f s", data["lt_name"], total_time)
 
 
 def do_plots(plt):
-    """ ___ """
+    """___"""
 
     plt.title()
     plt.plot_current_vs_time()
@@ -239,7 +245,7 @@ def read_settings():
 
 
 def main():
-    """ ___ """
+    """___"""
 
     # Init.
     settings = read_settings()

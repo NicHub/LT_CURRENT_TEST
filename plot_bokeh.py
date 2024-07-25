@@ -48,7 +48,7 @@ class PlotBokeh():
                 <h1>{self.__data["lt_name"]} Measurements</h1>
                 <h2>Bokeh plots</h2>
                 """,
-            style={
+            styles={
                 "width": "100%",
                 "height": "100px",
                 "text-align": "center",
@@ -75,7 +75,7 @@ class PlotBokeh():
             pl = plt.line("t", "y", source=data_source,
                           color=self.__settings["GENERAL"]["COLORS"][level],
                           alpha=self.__settings["BOKEH"]["ALPHA_1"])
-            pc = plt.circle("t", "y", source=data_source,
+            pc = plt.scatter("t", "y", source=data_source,
                             color=self.__settings["GENERAL"]["COLORS"][level],
                             size=self.__settings["BOKEH"]["CIRCLE_SIZE"],
                             alpha=self.__settings["BOKEH"]["ALPHA_6"])
@@ -88,8 +88,8 @@ class PlotBokeh():
         # Format plot.
         #
         plt.toolbar.logo = None
-        plt.plot_width = self.__settings["GENERAL"]["PLOT_WIDTH"]
-        plt.plot_height = self.__settings["GENERAL"]["PLOT_HEIGHT"]
+        plt.width = self.__settings["GENERAL"]["PLOT_WIDTH"]
+        plt.height = self.__settings["GENERAL"]["PLOT_HEIGHT"]
         plt.add_layout(
             Title(
                 text=f'{self.__data["lt_name"]} — Current vs time',
@@ -126,7 +126,7 @@ class PlotBokeh():
             pl = plt.line("t", "y", source=data_source,
                           color=self.__settings["GENERAL"]["COLORS"][level],
                           alpha=self.__settings["BOKEH"]["ALPHA_1"])
-            pc = plt.circle("t", "y", source=data_source,
+            pc = plt.scatter("t", "y", source=data_source,
                             color=self.__settings["GENERAL"]["COLORS"][level],
                             size=self.__settings["BOKEH"]["CIRCLE_SIZE"],
                             alpha=self.__settings["BOKEH"]["ALPHA_6"])
@@ -139,8 +139,8 @@ class PlotBokeh():
         # Format plot.
         #
         plt.toolbar.logo = None
-        plt.plot_width = self.__settings["GENERAL"]["PLOT_WIDTH"]
-        plt.plot_height = self.__settings["GENERAL"]["PLOT_HEIGHT"]
+        plt.width = self.__settings["GENERAL"]["PLOT_WIDTH"]
+        plt.height = self.__settings["GENERAL"]["PLOT_HEIGHT"]
         plt.add_layout(
             Title(
                 text=f'{self.__data["lt_name"]} — Resistance vs time',
@@ -178,7 +178,7 @@ class PlotBokeh():
             pl = plt.line("t", "y", source=data_source,
                           color=self.__settings["GENERAL"]["COLORS"][level],
                           alpha=self.__settings["BOKEH"]["ALPHA_1"])
-            pc = plt.circle("t", "y", source=data_source,
+            pc = plt.scatter("t", "y", source=data_source,
                             color=self.__settings["GENERAL"]["COLORS"][level],
                             size=self.__settings["BOKEH"]["CIRCLE_SIZE"],
                             alpha=self.__settings["BOKEH"]["ALPHA_6"])
@@ -191,8 +191,8 @@ class PlotBokeh():
         # Format plot.
         #
         plt.toolbar.logo = None
-        plt.plot_width = self.__settings["GENERAL"]["PLOT_WIDTH"]
-        plt.plot_height = self.__settings["GENERAL"]["PLOT_HEIGHT"]
+        plt.width = self.__settings["GENERAL"]["PLOT_WIDTH"]
+        plt.height = self.__settings["GENERAL"]["PLOT_HEIGHT"]
         plt.add_layout(
             Title(
                 text=f'{self.__data["lt_name"]} — Level vs time',
@@ -230,7 +230,7 @@ class PlotBokeh():
             pl = plt.line("t", "y", source=data_source,
                           color=self.__settings["GENERAL"]["COLORS"][level],
                           alpha=self.__settings["BOKEH"]["ALPHA_1"])
-            pc = plt.circle("t", "y", source=data_source,
+            pc = plt.scatter("t", "y", source=data_source,
                             color=self.__settings["GENERAL"]["COLORS"][level],
                             size=self.__settings["BOKEH"]["CIRCLE_SIZE"],
                             alpha=self.__settings["BOKEH"]["ALPHA_6"])
@@ -243,8 +243,8 @@ class PlotBokeh():
         # Format plot.
         #
         plt.toolbar.logo = None
-        plt.plot_width = self.__settings["GENERAL"]["PLOT_WIDTH"]
-        plt.plot_height = self.__settings["GENERAL"]["PLOT_HEIGHT"]
+        plt.width = self.__settings["GENERAL"]["PLOT_WIDTH"]
+        plt.height = self.__settings["GENERAL"]["PLOT_HEIGHT"]
         plt.add_layout(
             Title(
                 text=f'{self.__data["lt_name"]} — Resistivity vs time',
@@ -282,7 +282,7 @@ class PlotBokeh():
             pl = plt.line("i", "r", source=data_source,
                           color=self.__settings["GENERAL"]["COLORS"][level],
                           alpha=self.__settings["BOKEH"]["ALPHA_6"])
-            pc = plt.circle("i", "r", source=data_source,
+            pc = plt.scatter("i", "r", source=data_source,
                             color=self.__settings["GENERAL"]["COLORS"][level],
                             size=self.__settings["BOKEH"]["CIRCLE_SIZE"],
                             alpha=self.__settings["BOKEH"]["ALPHA_1"])
@@ -295,8 +295,8 @@ class PlotBokeh():
         # Format plot.
         #
         plt.toolbar.logo = None
-        plt.plot_width = self.__settings["GENERAL"]["PLOT_WIDTH"]
-        plt.plot_height = self.__settings["GENERAL"]["PLOT_WIDTH"]
+        plt.width = self.__settings["GENERAL"]["PLOT_WIDTH"]
+        plt.height = self.__settings["GENERAL"]["PLOT_WIDTH"]
         plt.add_layout(
             Title(
                 text=f'{self.__data["lt_name"]} — Resistance vs current',

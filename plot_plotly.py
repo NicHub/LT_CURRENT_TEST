@@ -22,11 +22,10 @@ Plotly documentation
 
 import logging
 import os
-import subprocess
-import sys
-
 import plotly as py
 import plotly.graph_objs as go
+import subprocess
+import sys
 
 
 class PlotPlotly():
